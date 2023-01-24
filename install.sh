@@ -3,7 +3,7 @@ REPO=probe_accuracy_tests
 
 cd "${HOME}" || exit
 # Clone repo if it doesn't exist
-[ -d "${REPO}" ] || git clone https://github.com/sporkus/probe_accuracy_tests 
+[ -d "${REPO}" ] || git clone https://github.com/boop5/probe_accuracy_tests 
 cd "${REPO}"; git pull
 
 # Install pip if it doesn't exist 
