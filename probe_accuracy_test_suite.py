@@ -39,7 +39,7 @@ def main(userparams):
     try:
         CFG.update(query_printer_objects("configfile", "config"))
         TOOLHEAD.update(query_printer_objects("toolhead"))
-        detect_probe()
+        # detect_probe()
         homing()
         level_bed()
         move_to_safe_z()
@@ -59,7 +59,8 @@ def main(userparams):
     except KeyboardInterrupt:
         pass
     if isKlicky:
-        send_gcode("DOCK_PROBE_UNLOCK")
+        #send_gcode("DOCK_PROBE_UNLOCK")
+        M402
     move_to_loc(*get_bed_center())
 
 
@@ -110,7 +111,7 @@ def test_repeatability(
     test_count=10, probe_count=6, force_dock=False, **kwargs
 ) -> pd.DataFrame:
     if isKlicky and not force_dock:
-        send_gcode("ATTACH_PROBE_LOCK")
+        send_gcode("M401")
 
     print(f"\nTake {test_count} probe_accuracy tests to check for repeatability")
     dfs = []
@@ -128,7 +129,7 @@ def test_repeatability(
         dfs.append(df)
     print("Done")
     if isKlicky and not force_dock:
-        send_gcode("DOCK_PROBE_UNLOCK")
+        send_gcode("M402")
 
     df = pd.concat(dfs, axis=0).sort_index()
     summary = summarize_results(df)
@@ -146,7 +147,7 @@ def test_corners(n=30, force_dock=False, **kwargs):
     )
     level_bed(force=True)
     if isKlicky and not force_dock:
-        send_gcode("ATTACH_PROBE_LOCK")
+        send_gcode("M401")
     dfs = []
     for i, xy in enumerate(get_bed_corners()):
         xy_txt = f"({xy[0]:.0f}, {xy[1]:.0f})"
@@ -162,7 +163,7 @@ def test_corners(n=30, force_dock=False, **kwargs):
         dfs.append(df)
     print("Done")
     if isKlicky and not force_dock:
-        send_gcode("DOCK_PROBE_UNLOCK")
+        send_gcode("M402")
     df = pd.concat(dfs, axis=0)
     summary = summarize_results(df)
     plot_nm = f"{RUNID} Corner Test\n({n} samples)"
@@ -190,7 +191,7 @@ def test_speed(force_dock=False, **kwargs):
 
     level_bed()
     if isKlicky and not force_dock:
-        send_gcode("ATTACH_PROBE_LOCK")
+        send_gcode("M401")
     dfs = []
     for spd in speeds:
         send_gcode(f"M117 {spd}mm/s probe speed")
@@ -201,7 +202,7 @@ def test_speed(force_dock=False, **kwargs):
     print("Done")
 
     if isKlicky and not force_dock:
-        send_gcode("DOCK_PROBE_UNLOCK")
+        send_gcode("M402")
     df = pd.concat(dfs, axis=0)
     summary = summarize_results(df)
     plot_nm = f"{RUNID} Speed Test)"
